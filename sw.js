@@ -1,6 +1,6 @@
 /* Service worker : app disponible hors-ligne.
    Incrémenter CACHE quand les fichiers changent pour forcer la mise à jour. */
-const CACHE = "gym-v1";
+const CACHE = "gym-v2";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", e => {

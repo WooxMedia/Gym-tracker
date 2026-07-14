@@ -18,26 +18,15 @@
   --acc:var(--red); --acc-ink:#fff;
   --shadow:0 8px 24px rgba(0,0,0,.35);
 }
-@media (prefers-color-scheme: light){
-  :root{
-    --bg:#EFF0F2; --surface:#FFFFFF; --surface-2:#F4F5F7; --line:#DDE0E4;
-    --ink:#171A1F; --muted:#5C636E; --faint:#9AA0A9;
-    --red:#C93232; --blue:#2A62C7; --yellow:#B98A0E; --green:#1F8A4C;
-    --shadow:0 6px 18px rgba(23,26,31,.10);
-  }
-}
-:root[data-theme="dark"]{
+/* Thème sombre permanent : app de gym, même look partout,
+   peu importe le réglage clair/sombre du système ou du visualiseur. */
+:root, :root[data-theme="dark"], :root[data-theme="light"]{
   --bg:#14161A; --surface:#1D2127; --surface-2:#252A31; --line:#2E333B;
   --ink:#EDEFF2; --muted:#8B93A0; --faint:#5C636E;
   --red:#E24444; --blue:#3B79E8; --yellow:#E9B227; --green:#34AD62;
   --shadow:0 8px 24px rgba(0,0,0,.35);
 }
-:root[data-theme="light"]{
-  --bg:#EFF0F2; --surface:#FFFFFF; --surface-2:#F4F5F7; --line:#DDE0E4;
-  --ink:#171A1F; --muted:#5C636E; --faint:#9AA0A9;
-  --red:#C93232; --blue:#2A62C7; --yellow:#B98A0E; --green:#1F8A4C;
-  --shadow:0 6px 18px rgba(23,26,31,.10);
-}
+:root{color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
@@ -101,9 +90,12 @@ input{font:inherit;color:inherit}
 .exlist{display:flex;flex-direction:column;gap:14px}
 .excard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;box-shadow:var(--shadow)}
 .excard .tag{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--acc)}
-.exname{width:100%;background:transparent;border:0;border-bottom:1px dashed transparent;
-  font-size:16.5px;font-weight:700;padding:2px 0 4px;margin-top:1px}
-.exname:hover,.exname:focus{border-bottom-color:var(--line);outline:none}
+.exrow{display:flex;align-items:center;gap:8px}
+.exrow .pen{flex:none;color:var(--faint);font-size:13px}
+.exname{width:100%;background:transparent;border:0;border-bottom:1.5px dashed var(--line);
+  font-size:16.5px;font-weight:700;padding:2px 0 5px;margin-top:1px}
+.exname::placeholder{color:var(--faint);font-weight:500;font-style:italic}
+.exname:focus{outline:none;border-bottom-color:var(--acc)}
 .sethead,.setrow{display:grid;grid-template-columns:34px 1fr 76px 64px 44px;gap:8px;align-items:center}
 .sethead{margin-top:10px;padding:0 2px 6px;color:var(--faint);font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
 .sethead .r{text-align:center}
@@ -265,7 +257,6 @@ function fmtDate(iso){
   return new Date(iso).toLocaleDateString("fr-CA", {weekday:"short", day:"numeric", month:"short"});
 }
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-function slotName(slot){ return store.names[slot.id] || slot.def; }
 function lastSession(dayId){
   for (let i = store.sessions.length - 1; i >= 0; i--)
     if (store.sessions[i].dayId === dayId) return store.sessions[i];
@@ -421,8 +412,12 @@ function renderDay(dayId){
     return `
     <section class="excard" data-slot="${slot.id}">
       <div class="tag">${esc(slot.muscle)}</div>
-      <input class="exname" data-slot="${slot.id}" value="${esc(slotName(slot))}" aria-label="Nom de l'exercice ${esc(slot.muscle)}" />
-      <div class="sethead"><span class="r">Série</span><span>Préc.</span><span class="r">Kg</span><span class="r">Reps</span><span class="r">✓</span></div>
+      <div class="exrow">
+        <input class="exname" data-slot="${slot.id}" value="${esc(store.names[slot.id] || "")}"
+          placeholder="Écris ton exercice (ex. ${esc(slot.def)})" aria-label="Nom de l'exercice ${esc(slot.muscle)}" />
+        <span class="pen" aria-hidden="true">✎</span>
+      </div>
+      <div class="sethead"><span class="r">Série</span><span>Préc.</span><span class="r">Lbs</span><span class="r">Reps</span><span class="r">✓</span></div>
       <div class="setlist">${rows}</div>
       <div class="setbtns">
         <button class="addset" data-action="add-set" data-slot="${slot.id}">+ Ajouter une série</button>
@@ -453,12 +448,12 @@ function renderDay(dayId){
 
 function setRowHTML(slotId, i, s, prevSet){
   const prevTxt = prevSet && (prevSet.w != null || prevSet.r != null)
-    ? `${prevSet.w ?? "–"} kg × ${prevSet.r ?? "–"}` : "—";
+    ? `${prevSet.w ?? "–"} lbs × ${prevSet.r ?? "–"}` : "—";
   return `
   <div class="setrow ${s.done ? "done" : ""}" data-slot="${slotId}" data-i="${i}">
     <span class="idx num">${i + 1}</span>
     <span class="prev num">${prevTxt}</span>
-    <input class="w num" type="text" inputmode="decimal" placeholder="kg" value="${s.w ?? ""}" aria-label="Charge série ${i+1}" />
+    <input class="w num" type="text" inputmode="decimal" placeholder="lbs" value="${s.w ?? ""}" aria-label="Charge série ${i+1}" />
     <input class="r num" type="text" inputmode="numeric" placeholder="reps" value="${s.r ?? ""}" aria-label="Répétitions série ${i+1}" />
     <button class="checkbtn" data-action="check-set" aria-label="Valider la série ${i+1}" aria-pressed="${!!s.done}">✓</button>
   </div>`;
@@ -471,7 +466,7 @@ function renderHistory(){
       const arr = sess.sets[slot.id] || [];
       if (!arr.length) return "";
       const txt = arr.map(s => `${s.w ?? "–"}×${s.r ?? "–"}`).join("  ");
-      return `<div class="hex"><span class="n">${esc(store.names[slot.id] || slot.def)}</span><span class="num">${txt}</span></div>`;
+      return `<div class="hex"><span class="n">${esc(store.names[slot.id] || slot.muscle)}</span><span class="num">${txt}</span></div>`;
     }).join("");
     return `
     <details class="histitem" style="--c:${day.color}">
@@ -481,7 +476,7 @@ function renderHistory(){
           <div class="hname">Jour ${day.num} · ${esc(day.name)}</div>
           <div class="hdate">${fmtDate(sess.date)}</div>
         </span>
-        <span class="hstats num">${sess.dur ? fmtClock(sess.dur) + "<br>" : ""}${volume(sess.sets).toLocaleString("fr-CA")} kg</span>
+        <span class="hstats num">${sess.dur ? fmtClock(sess.dur) + "<br>" : ""}${volume(sess.sets).toLocaleString("fr-CA")} lbs</span>
       </summary>
       <div class="histdetail">
         ${lines}
@@ -523,7 +518,7 @@ function finishWorkout(dayId){
     return;
   }
   const dur = draft.startedAt ? Math.round((Date.now() - draft.startedAt) / 1000) : null;
-  if (!confirm(`Terminer la séance ? ${Object.keys(sets).length} exercice(s), ${volume(sets).toLocaleString("fr-CA")} kg de volume.`)) return;
+  if (!confirm(`Terminer la séance ? ${Object.keys(sets).length} exercice(s), ${volume(sets).toLocaleString("fr-CA")} lbs de volume.`)) return;
   store.sessions.push({ id: Date.now(), dayId, date: new Date().toISOString(), dur, sets });
   delete store.drafts[dayId];
   save();
