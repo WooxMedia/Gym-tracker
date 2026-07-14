@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14161A">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+<title>Carnet de Gym — Split 4 jours</title>
+<style>
+:root{
+  --bg:#14161A; --surface:#1D2127; --surface-2:#252A31; --line:#2E333B;
+  --ink:#EDEFF2; --muted:#8B93A0; --faint:#5C636E;
+  --red:#E24444; --blue:#3B79E8; --yellow:#E9B227; --green:#34AD62;
+  --acc:var(--red); --acc-ink:#fff;
+  --shadow:0 8px 24px rgba(0,0,0,.35);
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#EFF0F2; --surface:#FFFFFF; --surface-2:#F4F5F7; --line:#DDE0E4;
+    --ink:#171A1F; --muted:#5C636E; --faint:#9AA0A9;
+    --red:#C93232; --blue:#2A62C7; --yellow:#B98A0E; --green:#1F8A4C;
+    --shadow:0 6px 18px rgba(23,26,31,.10);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14161A; --surface:#1D2127; --surface-2:#252A31; --line:#2E333B;
+  --ink:#EDEFF2; --muted:#8B93A0; --faint:#5C636E;
+  --red:#E24444; --blue:#3B79E8; --yellow:#E9B227; --green:#34AD62;
+  --shadow:0 8px 24px rgba(0,0,0,.35);
+}
+:root[data-theme="light"]{
+  --bg:#EFF0F2; --surface:#FFFFFF; --surface-2:#F4F5F7; --line:#DDE0E4;
+  --ink:#171A1F; --muted:#5C636E; --faint:#9AA0A9;
+  --red:#C93232; --blue:#2A62C7; --yellow:#B98A0E; --green:#1F8A4C;
+  --shadow:0 6px 18px rgba(23,26,31,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased; line-height:1.45;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+button:focus-visible, input:focus-visible, summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
+input{font:inherit;color:inherit}
+.app{max-width:520px;margin:0 auto;padding:16px 16px 140px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- Home ---------- */
+.home-head{margin:8px 0 20px}
+.home-head h1{margin:2px 0 0;font-size:28px;font-weight:800;letter-spacing:-.01em;text-transform:uppercase;text-wrap:balance}
+.home-head .sub{color:var(--muted);font-size:14px;margin-top:2px}
+.daylist{display:flex;flex-direction:column;gap:12px}
+.daycard{
+  display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:16px;box-shadow:var(--shadow);
+}
+.daycard:active{transform:scale(.99)}
+.plate{
+  flex:none;width:38px;height:38px;border-radius:50%;
+  background:radial-gradient(circle at 50% 50%, var(--bg) 0 6px, var(--c) 6.5px 100%);
+  box-shadow:inset 0 0 0 2px rgba(0,0,0,.18), inset 0 0 0 11px rgba(255,255,255,.07);
+}
+.daycard .body{flex:1;min-width:0}
+.daycard .title{display:block;font-weight:800;text-transform:uppercase;letter-spacing:.01em;font-size:16px}
+.daycard .title .dnum{color:var(--muted);font-weight:700}
+.daycard .muscles{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.daycard .meta{flex:none;text-align:right;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--c);border:1px solid var(--c);border-radius:99px;padding:2px 8px}
+.homefoot{margin-top:20px;display:flex;justify-content:center}
+.ghostbtn{
+  display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:13.5px;font-weight:600;
+  border:1px solid var(--line);border-radius:10px;padding:10px 16px;background:var(--surface);
+}
+
+/* ---------- Day screen ---------- */
+.day-head{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 0 12px;margin:0 0 8px;
+  display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+.backbtn{flex:none;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
+  display:flex;align-items:center;justify-content:center;font-size:18px}
+.day-head .mid{flex:1;min-width:0}
+.day-head .dtitle{font-weight:800;text-transform:uppercase;font-size:15px;letter-spacing:.01em}
+.day-head .chrono{font-size:12.5px;color:var(--muted)}
+.finishbtn{flex:none;background:var(--acc);color:var(--acc-ink);font-weight:700;font-size:13.5px;
+  border-radius:10px;padding:10px 14px}
+.restrow{display:flex;align-items:center;gap:8px;margin:12px 0 16px;flex-wrap:wrap}
+.restrow .eyebrow{margin-right:2px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 12px;
+  font-size:13px;font-weight:600;color:var(--muted)}
+.chip[aria-pressed="true"]{border-color:var(--acc);color:var(--acc);background:color-mix(in srgb,var(--acc) 12%, transparent)}
+.startrest{margin-left:auto;border-radius:99px;padding:6px 14px;font-size:13px;font-weight:700;
+  color:var(--acc);border:1px solid var(--acc)}
+.exlist{display:flex;flex-direction:column;gap:14px}
+.excard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;box-shadow:var(--shadow)}
+.excard .tag{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--acc)}
+.exname{width:100%;background:transparent;border:0;border-bottom:1px dashed transparent;
+  font-size:16.5px;font-weight:700;padding:2px 0 4px;margin-top:1px}
+.exname:hover,.exname:focus{border-bottom-color:var(--line);outline:none}
+.sethead,.setrow{display:grid;grid-template-columns:34px 1fr 76px 64px 44px;gap:8px;align-items:center}
+.sethead{margin-top:10px;padding:0 2px 6px;color:var(--faint);font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.sethead .r{text-align:center}
+.setrow{padding:5px 2px;border-radius:10px}
+.setrow + .setrow{margin-top:2px}
+.setrow .idx{color:var(--muted);font-weight:700;font-size:13.5px;text-align:center}
+.setrow .prev{color:var(--faint);font-size:13px}
+.setrow input{
+  width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:9px 6px;text-align:center;font-weight:700;font-size:15px;
+}
+.setrow input::placeholder{color:var(--faint);font-weight:500}
+.checkbtn{width:40px;height:40px;border-radius:10px;border:1.5px solid var(--line);
+  display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:17px;justify-self:center}
+.setrow.done{background:color-mix(in srgb,var(--acc) 9%, transparent)}
+.setrow.done .checkbtn{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.setrow.done input{border-color:color-mix(in srgb,var(--acc) 45%, var(--line))}
+.setbtns{display:flex;gap:8px;margin-top:10px}
+.addset{flex:1;border:1px dashed var(--line);border-radius:10px;padding:9px;color:var(--muted);font-weight:600;font-size:13.5px}
+.delset{flex:none;width:44px;border:1px dashed var(--line);border-radius:10px;color:var(--faint);font-size:16px}
+
+/* ---------- History ---------- */
+.hist-head{display:flex;align-items:center;gap:10px;margin:8px 0 16px}
+.hist-head h1{margin:0;font-size:22px;font-weight:800;text-transform:uppercase}
+.histlist{display:flex;flex-direction:column;gap:10px}
+.histitem{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.histitem summary{list-style:none;display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer}
+.histitem summary::-webkit-details-marker{display:none}
+.histitem .dot{flex:none;width:12px;height:12px;border-radius:50%;background:var(--c)}
+.histitem .hbody{flex:1;min-width:0}
+.histitem .hname{font-weight:700;font-size:14.5px}
+.histitem .hdate{color:var(--muted);font-size:12.5px}
+.histitem .hstats{flex:none;text-align:right;font-size:12.5px;color:var(--muted)}
+.histdetail{border-top:1px solid var(--line);padding:12px 14px;font-size:13.5px}
+.histdetail .hex{display:flex;justify-content:space-between;gap:12px;padding:4px 0}
+.histdetail .hex .n{color:var(--muted)}
+.histdetail .delsession{margin-top:10px;color:var(--red);font-size:12.5px;font-weight:600}
+.empty{color:var(--muted);text-align:center;padding:48px 12px;font-size:14.5px}
+
+/* ---------- Rest timer dock ---------- */
+.dock{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;display:none;
+  padding:10px 16px calc(12px + env(safe-area-inset-bottom));
+}
+.dock.on{display:block}
+.dock .inner{
+  max-width:520px;margin:0 auto;background:var(--surface);border:1px solid var(--line);
+  border-radius:16px;box-shadow:var(--shadow);padding:10px 14px 12px;
+}
+.dock .bar{height:4px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-bottom:8px}
+.dock .bar i{display:block;height:100%;background:var(--acc);width:100%}
+.dock .row{display:flex;align-items:center;gap:10px}
+.dock .label{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.dock .time{font-size:34px;font-weight:800;letter-spacing:-.01em;min-width:104px}
+.dock.finished .time{color:var(--acc)}
+.dock .ctl{display:flex;gap:8px;margin-left:auto}
+.dock .ctl button{
+  min-width:44px;height:44px;border-radius:11px;border:1px solid var(--line);background:var(--surface-2);
+  font-weight:700;font-size:14px;padding:0 10px;
+}
+.dock .ctl .main{background:var(--acc);border-color:var(--acc);color:var(--acc-ink);font-size:16px}
+@media (prefers-reduced-motion: no-preference){
+  .daycard,.setrow,.chip{transition:transform .12s ease, background .15s ease, border-color .15s ease}
+  .dock.finished .inner{animation:pulse 1s ease infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 35%, transparent)}}
+}
+</style>
+
+<div class="app" id="app"></div>
+
+<div class="dock" id="dock">
+  <div class="inner">
+    <div class="bar"><i id="dockBar"></i></div>
+    <div class="row">
+      <div>
+        <div class="label" id="dockLabel">Repos</div>
+        <div class="time num" id="dockTime">1:30</div>
+      </div>
+      <div class="ctl">
+        <button data-action="timer-minus" aria-label="Retirer 15 secondes">−15</button>
+        <button data-action="timer-plus" aria-label="Ajouter 15 secondes">+15</button>
+        <button class="main" data-action="timer-toggle" id="dockToggle" aria-label="Pause">⏸</button>
+        <button data-action="timer-stop" aria-label="Arrêter le timer">✕</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Programme ---------- */
+const DAYS = [
+  {id:"push", num:1, name:"Push", color:"var(--red)", cvar:"--red",
+   summary:"2× Pecs · 2× Épaules · 2× Triceps",
+   slots:[
+    {id:"push-c1", muscle:"Pecs 1",    def:"Développé couché"},
+    {id:"push-c2", muscle:"Pecs 2",    def:"Développé incliné haltères"},
+    {id:"push-s1", muscle:"Épaules 1", def:"Développé militaire"},
+    {id:"push-s2", muscle:"Épaules 2", def:"Élévations latérales"},
+    {id:"push-t1", muscle:"Triceps 1", def:"Extension poulie haute"},
+    {id:"push-t2", muscle:"Triceps 2", def:"Extension au-dessus de la tête"},
+  ]},
+  {id:"pull", num:2, name:"Pull", color:"var(--blue)", cvar:"--blue",
+   summary:"3× Dos · 2× Biceps · 1× Avant-bras",
+   slots:[
+    {id:"pull-b1", muscle:"Dos 1",       def:"Tractions"},
+    {id:"pull-b2", muscle:"Dos 2",       def:"Rowing barre"},
+    {id:"pull-b3", muscle:"Dos 3",       def:"Tirage horizontal"},
+    {id:"pull-bi1",muscle:"Biceps 1",    def:"Curl barre"},
+    {id:"pull-bi2",muscle:"Biceps 2",    def:"Curl marteau"},
+    {id:"pull-f1", muscle:"Avant-bras",  def:"Curl poignets"},
+  ]},
+  {id:"legs", num:3, name:"Legs + Abs", color:"var(--yellow)", cvar:"--yellow",
+   summary:"2× Quads/Ischios · 1× Fessiers · 1× Mollets · Abdos",
+   slots:[
+    {id:"legs-q1", muscle:"Quads/Ischios 1", def:"Squat"},
+    {id:"legs-q2", muscle:"Quads/Ischios 2", def:"Soulevé de terre roumain"},
+    {id:"legs-g1", muscle:"Fessiers",        def:"Hip thrust"},
+    {id:"legs-c1", muscle:"Mollets",         def:"Mollets debout"},
+    {id:"legs-a1", muscle:"Abdos 1",         def:"Crunch à la poulie"},
+    {id:"legs-a2", muscle:"Abdos 2",         def:"Relevés de jambes"},
+  ]},
+  {id:"upper", num:4, name:"Upper", color:"var(--green)", cvar:"--green",
+   summary:"2× Pecs · 2× Dos · 1× Épaules · 1× Biceps · 1× Triceps",
+   slots:[
+    {id:"up-c1", muscle:"Pecs 1",   def:"Développé couché haltères"},
+    {id:"up-c2", muscle:"Pecs 2",   def:"Écartés poulie"},
+    {id:"up-b1", muscle:"Dos 1",    def:"Tirage vertical"},
+    {id:"up-b2", muscle:"Dos 2",    def:"Rowing haltère"},
+    {id:"up-s1", muscle:"Épaules",  def:"Élévations latérales"},
+    {id:"up-bi1",muscle:"Biceps",   def:"Curl incliné"},
+    {id:"up-t1", muscle:"Triceps",  def:"Extension poulie corde"},
+  ]},
+];
+const dayById = id => DAYS.find(d => d.id === id);
+
+/* ---------- Stockage ---------- */
+const KEY = "gymtracker.v1";
+let store;
+try { store = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ store = {}; }
+store.names    = store.names    || {};   // slotId -> nom personnalisé
+store.sessions = store.sessions || [];   // séances terminées
+store.drafts   = store.drafts   || {};   // dayId -> séance en cours
+store.settings = store.settings || { rest: 90 };
+function save(){ localStorage.setItem(KEY, JSON.stringify(store)); }
+
+/* ---------- Utilitaires ---------- */
+const $ = s => document.querySelector(s);
+const app = $("#app");
+function fmtClock(sec){
+  sec = Math.max(0, Math.round(sec));
+  const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
+  return h ? `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`
+           : `${m}:${String(s).padStart(2,"0")}`;
+}
+function fmtDate(iso){
+  return new Date(iso).toLocaleDateString("fr-CA", {weekday:"short", day:"numeric", month:"short"});
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function slotName(slot){ return store.names[slot.id] || slot.def; }
+function lastSession(dayId){
+  for (let i = store.sessions.length - 1; i >= 0; i--)
+    if (store.sessions[i].dayId === dayId) return store.sessions[i];
+  return null;
+}
+function volume(sets){
+  let v = 0;
+  for (const arr of Object.values(sets)) for (const s of arr) v += (s.w||0)*(s.r||0);
+  return Math.round(v);
+}
+
+/* ---------- Brouillon de séance ---------- */
+function getDraft(dayId){
+  if (store.drafts[dayId]) return store.drafts[dayId];
+  const day = dayById(dayId), prev = lastSession(dayId);
+  const sets = {};
+  for (const slot of day.slots){
+    const p = prev && prev.sets[slot.id];
+    sets[slot.id] = (p && p.length ? p : [{},{},{}]).map(s => ({ w: s.w ?? null, r: s.r ?? null, done: false }));
+  }
+  store.drafts[dayId] = { dayId, startedAt: null, sets };
+  save();
+  return store.drafts[dayId];
+}
+
+/* ---------- Timer de repos ---------- */
+const rest = { total: 0, left: 0, running: false, iv: null };
+let audioCtx = null;
+function beep(){
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    for (let i = 0; i < 3; i++){
+      const t = audioCtx.currentTime + i * 0.32;
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.frequency.value = 880; o.type = "sine";
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.4, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t + 0.3);
+    }
+  } catch(e){}
+  if (navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
+}
+function unlockAudio(){
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  } catch(e){}
+}
+const dock = $("#dock");
+function renderDock(){
+  $("#dockTime").textContent = fmtClock(rest.left);
+  $("#dockBar").style.width = rest.total ? (rest.left / rest.total * 100) + "%" : "0%";
+  $("#dockToggle").textContent = rest.running ? "⏸" : "▶";
+  $("#dockToggle").setAttribute("aria-label", rest.running ? "Pause" : "Reprendre");
+}
+function startRest(sec){
+  unlockAudio();
+  clearInterval(rest.iv);
+  rest.total = sec; rest.left = sec; rest.running = true;
+  dock.classList.add("on"); dock.classList.remove("finished");
+  $("#dockLabel").textContent = "Repos";
+  rest.iv = setInterval(tickRest, 250);
+  rest.lastTick = Date.now();
+  renderDock();
+}
+function tickRest(){
+  if (!rest.running) return;
+  const now = Date.now();
+  rest.left -= (now - rest.lastTick) / 1000;
+  rest.lastTick = now;
+  if (rest.left <= 0){
+    rest.left = 0; rest.running = false;
+    clearInterval(rest.iv);
+    dock.classList.add("finished");
+    $("#dockLabel").textContent = "Repos terminé — go!";
+    beep();
+    setTimeout(() => { if (!rest.running && rest.left === 0) stopRest(); }, 5000);
+  }
+  renderDock();
+}
+function stopRest(){
+  clearInterval(rest.iv);
+  rest.running = false; rest.left = 0; rest.total = 0;
+  dock.classList.remove("on", "finished");
+}
+
+/* ---------- Chrono de séance ---------- */
+let chronoIv = null;
+function tickChrono(){
+  const el = $("#chrono");
+  if (!el){ clearInterval(chronoIv); chronoIv = null; return; }
+  const d = store.drafts[el.dataset.day];
+  el.textContent = d && d.startedAt ? "Séance : " + fmtClock((Date.now() - d.startedAt)/1000) : "Séance non commencée";
+}
+function ensureStarted(draft){
+  if (!draft.startedAt){
+    draft.startedAt = Date.now();
+    save();
+    if (!chronoIv) chronoIv = setInterval(tickChrono, 1000);
+    tickChrono();
+  }
+}
+
+/* ---------- Écrans ---------- */
+let screen = { name: "home" };
+
+function renderHome(){
+  const cards = DAYS.map(day => {
+    const prev = lastSession(day.id);
+    const draft = store.drafts[day.id];
+    const started = draft && (draft.startedAt || Object.values(draft.sets).some(a => a.some(s => s.done)));
+    return `
+    <button class="daycard" data-action="nav-day" data-day="${day.id}" style="--c:${day.color}">
+      <span class="plate" aria-hidden="true"></span>
+      <span class="body">
+        <span class="title"><span class="dnum">Jour ${day.num}</span> · ${esc(day.name)}</span>
+        <span class="muscles">${esc(day.summary)}</span>
+      </span>
+      <span class="meta">
+        ${started ? `<span class="badge">En cours</span>` : ""}
+        <span>${prev ? "Dern. : " + fmtDate(prev.date) : "Jamais fait"}</span>
+      </span>
+    </button>`;
+  }).join("");
+  app.innerHTML = `
+    <header class="home-head">
+      <div class="eyebrow">Carnet d'entraînement</div>
+      <h1>Split 4 jours</h1>
+      <div class="sub num">${store.sessions.length} séance${store.sessions.length > 1 ? "s" : ""} enregistrée${store.sessions.length > 1 ? "s" : ""}</div>
+    </header>
+    <div class="daylist">${cards}</div>
+    <div class="homefoot">
+      <button class="ghostbtn" data-action="nav-history">📓 Historique</button>
+    </div>`;
+}
+
+function renderDay(dayId){
+  const day = dayById(dayId);
+  const draft = getDraft(dayId);
+  const prev = lastSession(dayId);
+  document.documentElement.style.setProperty("--acc", `var(${day.cvar})`);
+
+  const restChips = [60, 90, 120, 180].map(s =>
+    `<button class="chip num" data-action="preset-rest" data-sec="${s}" aria-pressed="${store.settings.rest === s}">${fmtClock(s)}</button>`
+  ).join("");
+
+  const cards = day.slots.map(slot => {
+    const sets = draft.sets[slot.id];
+    const prevSets = prev && prev.sets[slot.id] || [];
+    const rows = sets.map((s, i) => setRowHTML(slot.id, i, s, prevSets[i])).join("");
+    return `
+    <section class="excard" data-slot="${slot.id}">
+      <div class="tag">${esc(slot.muscle)}</div>
+      <input class="exname" data-slot="${slot.id}" value="${esc(slotName(slot))}" aria-label="Nom de l'exercice ${esc(slot.muscle)}" />
+      <div class="sethead"><span class="r">Série</span><span>Préc.</span><span class="r">Kg</span><span class="r">Reps</span><span class="r">✓</span></div>
+      <div class="setlist">${rows}</div>
+      <div class="setbtns">
+        <button class="addset" data-action="add-set" data-slot="${slot.id}">+ Ajouter une série</button>
+        <button class="delset" data-action="del-set" data-slot="${slot.id}" aria-label="Retirer la dernière série">−</button>
+      </div>
+    </section>`;
+  }).join("");
+
+  app.innerHTML = `
+    <header class="day-head">
+      <button class="backbtn" data-action="nav-home" aria-label="Retour">←</button>
+      <div class="mid">
+        <div class="dtitle">Jour ${day.num} · ${esc(day.name)}</div>
+        <div class="chrono num" id="chrono" data-day="${day.id}">Séance non commencée</div>
+      </div>
+      <button class="finishbtn" data-action="finish" data-day="${day.id}">Terminer</button>
+    </header>
+    <div class="restrow">
+      <span class="eyebrow">Repos</span>
+      ${restChips}
+      <button class="startrest" data-action="rest-start">▶ Lancer</button>
+    </div>
+    <div class="exlist">${cards}</div>`;
+
+  if (draft.startedAt && !chronoIv) chronoIv = setInterval(tickChrono, 1000);
+  tickChrono();
+}
+
+function setRowHTML(slotId, i, s, prevSet){
+  const prevTxt = prevSet && (prevSet.w != null || prevSet.r != null)
+    ? `${prevSet.w ?? "–"} kg × ${prevSet.r ?? "–"}` : "—";
+  return `
+  <div class="setrow ${s.done ? "done" : ""}" data-slot="${slotId}" data-i="${i}">
+    <span class="idx num">${i + 1}</span>
+    <span class="prev num">${prevTxt}</span>
+    <input class="w num" type="text" inputmode="decimal" placeholder="kg" value="${s.w ?? ""}" aria-label="Charge série ${i+1}" />
+    <input class="r num" type="text" inputmode="numeric" placeholder="reps" value="${s.r ?? ""}" aria-label="Répétitions série ${i+1}" />
+    <button class="checkbtn" data-action="check-set" aria-label="Valider la série ${i+1}" aria-pressed="${!!s.done}">✓</button>
+  </div>`;
+}
+
+function renderHistory(){
+  const items = [...store.sessions].reverse().map(sess => {
+    const day = dayById(sess.dayId);
+    const lines = day.slots.map(slot => {
+      const arr = sess.sets[slot.id] || [];
+      if (!arr.length) return "";
+      const txt = arr.map(s => `${s.w ?? "–"}×${s.r ?? "–"}`).join("  ");
+      return `<div class="hex"><span class="n">${esc(store.names[slot.id] || slot.def)}</span><span class="num">${txt}</span></div>`;
+    }).join("");
+    return `
+    <details class="histitem" style="--c:${day.color}">
+      <summary>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="hbody">
+          <div class="hname">Jour ${day.num} · ${esc(day.name)}</div>
+          <div class="hdate">${fmtDate(sess.date)}</div>
+        </span>
+        <span class="hstats num">${sess.dur ? fmtClock(sess.dur) + "<br>" : ""}${volume(sess.sets).toLocaleString("fr-CA")} kg</span>
+      </summary>
+      <div class="histdetail">
+        ${lines}
+        <button class="delsession" data-action="del-session" data-id="${sess.id}">Supprimer cette séance</button>
+      </div>
+    </details>`;
+  }).join("");
+  app.innerHTML = `
+    <header class="hist-head">
+      <button class="backbtn" data-action="nav-home" aria-label="Retour">←</button>
+      <h1>Historique</h1>
+    </header>
+    ${items ? `<div class="histlist">${items}</div>` : `<div class="empty">Aucune séance enregistrée pour l'instant.<br>Termine ta première séance et elle apparaîtra ici. 💪</div>`}`;
+}
+
+function show(name, dayId){
+  screen = { name, dayId };
+  clearInterval(chronoIv); chronoIv = null;
+  if (name === "home"){ document.documentElement.style.removeProperty("--acc"); renderHome(); }
+  else if (name === "day") renderDay(dayId);
+  else renderHistory();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- Terminer une séance ---------- */
+function finishWorkout(dayId){
+  const draft = store.drafts[dayId];
+  if (!draft) return;
+  const sets = {};
+  let any = false;
+  for (const [slotId, arr] of Object.entries(draft.sets)){
+    const done = arr.filter(s => s.done && (s.w != null || s.r != null));
+    if (done.length){ sets[slotId] = done.map(s => ({ w: s.w, r: s.r })); any = true; }
+  }
+  if (!any){
+    if (confirm("Aucune série validée (✓). Abandonner cette séance sans l'enregistrer ?")){
+      delete store.drafts[dayId]; save(); show("home");
+    }
+    return;
+  }
+  const dur = draft.startedAt ? Math.round((Date.now() - draft.startedAt) / 1000) : null;
+  if (!confirm(`Terminer la séance ? ${Object.keys(sets).length} exercice(s), ${volume(sets).toLocaleString("fr-CA")} kg de volume.`)) return;
+  store.sessions.push({ id: Date.now(), dayId, date: new Date().toISOString(), dur, sets });
+  delete store.drafts[dayId];
+  save();
+  stopRest();
+  show("home");
+}
+
+/* ---------- Événements ---------- */
+document.addEventListener("click", e => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
+  const a = btn.dataset.action;
+
+  if (a === "nav-home") show("home");
+  else if (a === "nav-history") show("history");
+  else if (a === "nav-day") show("day", btn.dataset.day);
+  else if (a === "finish") finishWorkout(btn.dataset.day);
+
+  else if (a === "preset-rest"){
+    store.settings.rest = +btn.dataset.sec; save();
+    document.querySelectorAll('[data-action="preset-rest"]').forEach(c =>
+      c.setAttribute("aria-pressed", +c.dataset.sec === store.settings.rest));
+  }
+  else if (a === "rest-start") startRest(store.settings.rest);
+  else if (a === "timer-toggle"){
+    if (rest.left <= 0) return;
+    rest.running = !rest.running;
+    if (rest.running){ rest.lastTick = Date.now(); }
+    renderDock();
+  }
+  else if (a === "timer-plus"){ rest.left += 15; rest.total = Math.max(rest.total, rest.left); dock.classList.remove("finished"); $("#dockLabel").textContent="Repos"; if(!rest.running){rest.running=true;rest.lastTick=Date.now();clearInterval(rest.iv);rest.iv=setInterval(tickRest,250);} renderDock(); }
+  else if (a === "timer-minus"){ rest.left = Math.max(0, rest.left - 15); renderDock(); if (rest.left === 0){ rest.running = false; clearInterval(rest.iv); stopRest(); } }
+  else if (a === "timer-stop") stopRest();
+
+  else if (a === "check-set"){
+    const row = btn.closest(".setrow");
+    const draft = getDraft(screen.dayId);
+    const s = draft.sets[row.dataset.slot][+row.dataset.i];
+    readRowInputs(row, s);
+    s.done = !s.done;
+    row.classList.toggle("done", s.done);
+    btn.setAttribute("aria-pressed", String(s.done));
+    ensureStarted(draft);
+    save();
+    if (s.done) startRest(store.settings.rest);
+  }
+  else if (a === "add-set"){
+    const slotId = btn.dataset.slot;
+    const draft = getDraft(screen.dayId);
+    const arr = draft.sets[slotId];
+    const last = arr[arr.length - 1];
+    arr.push({ w: last ? last.w : null, r: last ? last.r : null, done: false });
+    save();
+    const card = btn.closest(".excard");
+    const prev = lastSession(screen.dayId);
+    const slotPrev = prev && prev.sets[slotId] || [];
+    card.querySelector(".setlist").insertAdjacentHTML("beforeend",
+      setRowHTML(slotId, arr.length - 1, arr[arr.length - 1], slotPrev[arr.length - 1]));
+  }
+  else if (a === "del-set"){
+    const slotId = btn.dataset.slot;
+    const draft = getDraft(screen.dayId);
+    const arr = draft.sets[slotId];
+    if (arr.length <= 1) return;
+    arr.pop(); save();
+    const list = btn.closest(".excard").querySelector(".setlist");
+    list.lastElementChild.remove();
+  }
+  else if (a === "del-session"){
+    if (!confirm("Supprimer cette séance de l'historique ?")) return;
+    store.sessions = store.sessions.filter(s => s.id !== +btn.dataset.id);
+    save();
+    renderHistory();
+  }
+});
+
+function readRowInputs(row, s){
+  const w = row.querySelector(".w").value.replace(",", ".").trim();
+  const r = row.querySelector(".r").value.trim();
+  s.w = w === "" ? null : parseFloat(w);
+  s.r = r === "" ? null : parseInt(r, 10);
+  if (Number.isNaN(s.w)) s.w = null;
+  if (Number.isNaN(s.r)) s.r = null;
+}
+
+document.addEventListener("input", e => {
+  const el = e.target;
+  if (el.classList.contains("exname")){
+    store.names[el.dataset.slot] = el.value.trim() || undefined;
+    save();
+  } else if (el.classList.contains("w") || el.classList.contains("r")){
+    const row = el.closest(".setrow");
+    if (!row || screen.name !== "day") return;
+    const draft = getDraft(screen.dayId);
+    readRowInputs(row, draft.sets[row.dataset.slot][+row.dataset.i]);
+    save();
+  }
+});
+
+show("home");
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator && location.protocol === "https:")
+  navigator.serviceWorker.register("./sw.js").catch(() => {});
+</script>
+</body>
+</html>
